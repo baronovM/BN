@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Gemini</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .chat-container { background-color: #fff; width: 80%; max-width: 700px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; height: 80vh; }
+        .chat-header { background-color: #007bff; color: white; padding: 15px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }
+        .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; border-bottom: 1px solid #ddd; }
+        .message { margin-bottom: 15px; padding: 10px; border-radius: 5px; line-height: 1.4; }
+        .user-message { background-color: #e1f5fe; margin-left: auto; text-align: right; max-width: 70%;}
+        .bot-message { background-color: #f0f0f0; text-align: left; max-width: 70%;}
+        .message p { margin: 0; }
+        .message .sender { font-weight: bold; margin-bottom: 5px; font-size: 0.9em; color: #555;}
+        .chat-input { display: flex; padding: 15px; border-top: 1px solid #ddd; }
+        .chat-input input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px; }
+        .chat-input button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .chat-input button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Gemini Chat</h2>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            {% if not conversation %}
+                <p style="text-align:center; color:#777;">No messages yet. Start a conversation!</p>
+            {% endif %}
+            {% for user_msg, bot_msg in conversation %}
+                <div class="message user-message">
+                    <p class="sender">You</p>
+                    <p>{{ user_msg }}</p>
+                </div>
+                <div class="message bot-message">
+                    <p class="sender">Gemini</p>
+                    <p>{{ bot_msg | safe }}</p> {# Use |safe if LLM can return HTML/Markdown #}
+                </div>
+            {% endfor %}
+        </div>
+        <form method="POST" enctype="multipart/form-data" class="chat-input">
+{#            <input type="file" name="image" accept="image/*" />#}
+            <input type="text" name="message" placeholder="Type your message..." required autofocus>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // Minimal JavaScript to scroll to the bottom of the chat messages
+        // This is the only JS here, and it's for user experience.
+        // The core chat functionality works without it (user would just have to scroll manually).
+        window.onload = function() {
+            var chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        };
+    </script>
+</body>
+</html>
