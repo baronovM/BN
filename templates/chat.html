@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat with Gemini</title>
+    <title>B&N — помощник для школьника</title>
     <style>
         body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .chat-container { background-color: #fff; width: 80%; max-width: 700px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; height: 80vh; }
+        .chat-container { background-color: #fff; width: 80%; max-width: 1300px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 8px; display: flex; flex-direction: column; height: 90vh; }
         .chat-header { background-color: #007bff; color: white; padding: 15px; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px; }
         .chat-messages { flex-grow: 1; padding: 20px; overflow-y: auto; border-bottom: 1px solid #ddd; }
         .message { margin-bottom: 15px; padding: 10px; border-radius: 5px; line-height: 1.4; }
@@ -23,7 +23,7 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h2>Gemini Chat</h2>
+            <h2>B&N — помощник для школьника</h2>
         </div>
         <div class="chat-messages" id="chatMessages">
             {% if not conversation %}
@@ -35,7 +35,7 @@
                     <p>{{ user_msg }}</p>
                 </div>
                 <div class="message bot-message">
-                    <p class="sender">Gemini</p>
+                    <p class="sender">Помощник</p>
                     <p>{{ bot_msg | safe }}</p> {# Use |safe if LLM can return HTML/Markdown #}
                 </div>
             {% endfor %}
