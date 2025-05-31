@@ -9,16 +9,11 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# 1. Instantiate the Gen AI client
-try:
-    api_key = os.getenv("API_KEY")
-    if not api_key:
-        raise ValueError("API_KEY not found in environment variables.")
-    client = genai.Client(api_key=api_key,
-                          http_options=types.HttpOptions(base_url="https://api.proxyapi.ru/google/"))
-except Exception as e:
-    print(f"Error creating GenAI client: {e}")
-    client = None
+api_key = os.getenv("API_KEY")
+client = genai.Client(
+    api_key=api_key,
+    http_options={"base_url": "https://api.proxyapi.ru/google"}
+)
 
 # Ваш системный промпт
 SYSTEM_PROMPT = (
@@ -48,6 +43,7 @@ SYSTEM_PROMPT = (
     """
 )
 
+
 @app.route('/', methods=['GET', 'POST'])
 def chat():
     if 'conversation' not in session:
@@ -57,6 +53,8 @@ def chat():
     bot_response = ""
     if request.method == 'POST':
         user_message = request.form.get('message', '').strip()
+        image_file = request.files.get('image')
+
         if not user_message:
             # Let HTML required attribute handle empty submissions
             pass
@@ -77,22 +75,32 @@ def chat():
                     model="gemini-2.0-flash",
                     history=api_history,
                     config=types.GenerateContentConfig(
-                        temperature=0.7,
+                        temperature=0.2,
                         system_instruction=SYSTEM_PROMPT
                     ),
                 )
 
-                # 4. Send the new message
-                response = chat.send_message(user_message)
-                bot_response = response.text
+                # if image_file:
+                #     img = Image.open(image_file.stream)
+                #     img.thumbnail((1024, 1024))
+                #     buf = io.BytesIO()
+                #     img.save(buf, format="JPEG", quality=75)
+                #     b64 = base64.b64encode(buf.getvalue())
+                # else:
+                #     b64 = None
+                if image_file:
+                    image_bytes = image_file.read()
+                    response = chat.send_message(
+                        [types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"), user_message])
+                else:
+                    response = chat.send_message(user_message)
 
-                # 5. Save to session history
-                session['conversation'].append((user_message, bot_response))
-                session.modified = True
+                bot_response = response.text
 
             except Exception as e:
                 print(f"Error during GenAI call: {e}")
                 bot_response = f"Error communicating with LLM: {e}"
+            finally:
                 session['conversation'].append((user_message, bot_response))
                 session.modified = True
 
